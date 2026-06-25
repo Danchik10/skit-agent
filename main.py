@@ -83,7 +83,6 @@ async def main():
         llm = OllamaClient()
         res = await llm.summarize(result)
         print(res)
-
 if __name__ == "__main__":
 
     asyncio.run(main())
