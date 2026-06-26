@@ -20,7 +20,7 @@ class OllamaClient:
 
         response = await self.client.chat(
 
-            model="llama3",
+            model="smollm2",
 
             messages=[
                 {
@@ -32,6 +32,7 @@ class OllamaClient:
         )
 
         return AnalysisResult(
+            success=True,
             event_type=diagnostic.event_type,
             host=diagnostic.host,
             summary=response["message"]["content"]

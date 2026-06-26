@@ -1,3 +1,6 @@
+from models.diagnostic import DiagnosticResult
+from services.commands import LinuxCommands
+
 class ServiceHandler:
 
     def __init__(self, ssh):
@@ -6,20 +9,32 @@ class ServiceHandler:
     async def analyze(
         self,
         host,
-        service_name
+        service_name: str = 'nginx'
     ):
-
         status = self.ssh.execute(
             host,
-            f"systemctl status {service_name}"
+            LinuxCommands.SERVICE_STATUS.format(
+                service=service_name
+            )
         )
 
         logs = self.ssh.execute(
             host,
-            f"journalctl -u {service_name} -n 30"
+            LinuxCommands.SERVICE_LOGS.format(
+                service=service_name
+            )
         )
 
-        return {
-            "status": status,
-            "logs": logs
-        }
+        return DiagnosticResult(
+    event_type="service",
+    host=host,
+    diagnostics=f"""
+=== STATUS ===
+
+{status}
+
+=== LOGS ===
+
+{logs}
+"""
+)

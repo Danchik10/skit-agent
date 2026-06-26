@@ -1,5 +1,5 @@
 from models.diagnostic import DiagnosticResult
-
+from services.commands import LinuxCommands
 
 class DiskHandler:
 
@@ -8,11 +8,11 @@ class DiskHandler:
 
     async def analyze(self, host):
 
-        disk = self.ssh.execute(host, "df -h")
+        disk = self.ssh.execute(host, LinuxCommands.DISK_USAGE)
 
         folders = self.ssh.execute(
             host,
-            "du -h /var --max-depth=1 | sort -hr | head"
+            LinuxCommands.LARGE_DIRECTORIES
         )
 
         diagnostics = f"""

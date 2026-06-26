@@ -1,4 +1,5 @@
 from models.diagnostic import DiagnosticResult
+from services.commands import LinuxCommands
 
 class CPUHandler:
 
@@ -9,7 +10,7 @@ class CPUHandler:
 
         processes = self.ssh.execute(
             host,
-            "ps aux --sort=-%cpu | head -10"
+            LinuxCommands.CPU_PROCESSES
         )
 
         return DiagnosticResult(event_type="cpu", host=host,diagnostics=processes)

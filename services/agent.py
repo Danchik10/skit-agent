@@ -15,11 +15,15 @@ class Agent:
 
         self.router = EventRouter()
 
-        self.ssh = ssh
-
         self.llm = llm
 
-    async def process(self, event):
+        self.handlers = {
+            "cpu": CPUHandler(ssh),
+            "disk": DiskHandler(ssh),
+            "service": ServiceHandler(ssh)
+        }
+
+    async def process(self, event) -> AnalysisResult:
 
         logger.info(f"Получено событие: {event.message}")
 
@@ -27,44 +31,42 @@ class Agent:
 
         logger.info(f"Тип события: {event_type}")
 
-        if event_type == "cpu":
-            handler = CPUHandler(self.ssh)
+        handler = self.handlers.get(event_type)
 
-        elif event_type == "disk":
-            handler = DiskHandler(self.ssh)
-
-        elif event_type == "service":
-            handler = ServiceHandler(self.ssh)
-
-        else:
+        if handler is None:
+            logger.warning("Не найден обработчик события.")
 
             return AnalysisResult(
                 success=False,
-                event_type="unknown",
+                event_type=event_type,
                 host=event.interface_ip,
-                summary="Неизвестный тип события."
+                summary=f"Для события '{event_type}' обработчик отсутствует."
             )
 
         try:
+
+            logger.info("Запуск диагностики...")
 
             diagnostic = await handler.analyze(
                 event.interface_ip
             )
 
+            logger.info("Диагностика завершена.")
+
             prompt = PromptBuilder.build(
                 diagnostic
             )
 
-            result = await self.llm.analyze(
+            logger.info("Отправка данных в LLM...")
+
+            analysis = await self.llm.analyze(
                 diagnostic,
                 prompt
             )
 
-            result.success = True
+            logger.info("Ответ от LLM получен.")
 
-            logger.info("Анализ успешно завершен")
-
-            return result
+            return analysis
 
         except Exception as e:
 

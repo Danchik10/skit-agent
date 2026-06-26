@@ -1,17 +1,35 @@
 class EventRouter:
 
-    @staticmethod
-    def detect(event):
+    CPU_KEYWORDS = (
+        "cpu",
+        "processor",
+        "load"
+    )
 
-        msg = event.message.lower()
+    DISK_KEYWORDS = (
+        "disk",
+        "space",
+        "filesystem"
+    )
 
-        if "disk" in msg:
-            return "disk"
+    SERVICE_KEYWORDS = (
+        "down",
+        "inactive",
+        "failed"
+    )
 
-        if "cpu" in msg:
+    @classmethod
+    def detect(cls, event):
+
+        message = event.message.lower()
+
+        if any(word in message for word in cls.CPU_KEYWORDS):
             return "cpu"
 
-        if "down" in msg:
+        if any(word in message for word in cls.DISK_KEYWORDS):
+            return "disk"
+
+        if any(word in message for word in cls.SERVICE_KEYWORDS):
             return "service"
 
         return "unknown"

@@ -10,9 +10,11 @@ from llm.ollama_client import OllamaClient
 
 async def main():
 
-    event = EventLoader.load(
-        "examples/cpu.json"
-    )
+    events = [
+        EventLoader.load("examples/cpu.json"),
+        EventLoader.load("examples/disk.json"),
+        EventLoader.load("examples/service.json"),
+    ]
 
     ssh = FakeSSHClient()
 
@@ -23,11 +25,11 @@ async def main():
         llm=llm
     )
 
-    result = await agent.process(
-        event
-    )
+    for event in events:
+        result = await agent.process(event)
 
-    print(result.model_dump_json(indent=4))
+        print(result.model_dump_json(indent=4))
+
 
 
 if __name__ == "__main__":
