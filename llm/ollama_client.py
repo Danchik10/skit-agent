@@ -1,34 +1,38 @@
 from ollama import AsyncClient
 
+from models.analysis import AnalysisResult
+from models.diagnostic import DiagnosticResult
+
 
 class OllamaClient:
 
-    async def summarize(
-        self,
-        raw_data
-    ):
+    def __init__(self):
 
-        client = AsyncClient(
-            host="http://ollama:11434"
+        self.client = AsyncClient(
+            host="http://localhost:11434"
         )
 
-        response = await client.chat(
+    async def analyze(
+        self,
+        diagnostic: DiagnosticResult,
+        prompt: str
+    ) -> AnalysisResult:
+
+        response = await self.client.chat(
+
             model="llama3",
+
             messages=[
                 {
                     "role": "user",
-                    "content":
-                    f"""
-                    Ты DevOps инженер.
-
-                    Проанализируй данные:
-
-                    {raw_data}
-
-                    Верни краткий отчет.
-                    """
+                    "content": prompt
                 }
             ]
+
         )
 
-        return response["message"]["content"]
+        return AnalysisResult(
+            event_type=diagnostic.event_type,
+            host=diagnostic.host,
+            summary=response["message"]["content"]
+        )

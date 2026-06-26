@@ -1,0 +1,13 @@
+{
+  "event_id": "019ee995-232f-7166-bc81-a437e483aa54",
+  "object_id": 159,
+  "object_name": "Server-03",
+  "interface_id": 265,
+  "interface_name": "eth0",
+  "interface_ip": "192.168.1.12",
+  "app_name": "monitoring",
+  "message": "nginx is down",
+  "summary": "status",
+  "severity": "critical",
+  "timestamp": "2026-06-21T09:48:45Z"
+}

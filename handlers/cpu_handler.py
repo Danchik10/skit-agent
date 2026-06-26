@@ -1,3 +1,5 @@
+from models.diagnostic import DiagnosticResult
+
 class CPUHandler:
 
     def __init__(self, ssh):
@@ -5,11 +7,9 @@ class CPUHandler:
 
     async def analyze(self, host):
 
-        top_processes = self.ssh.execute(
+        processes = self.ssh.execute(
             host,
             "ps aux --sort=-%cpu | head -10"
         )
 
-        return {
-            "processes": top_processes
-        }
+        return DiagnosticResult(event_type="cpu", host=host,diagnostics=processes)

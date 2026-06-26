@@ -1,3 +1,6 @@
+from models.diagnostic import DiagnosticResult
+
+
 class DiskHandler:
 
     def __init__(self, ssh):
@@ -5,17 +8,25 @@ class DiskHandler:
 
     async def analyze(self, host):
 
-        df = self.ssh.execute(
-            host,
-            "df -h"
-        )
+        disk = self.ssh.execute(host, "df -h")
 
-        du = self.ssh.execute(
+        folders = self.ssh.execute(
             host,
             "du -h /var --max-depth=1 | sort -hr | head"
         )
 
-        return {
-            "df": df,
-            "du": du
-        }
+        diagnostics = f"""
+=== Disk ===
+
+{disk}
+
+=== Large folders ===
+
+{folders}
+"""
+
+        return DiagnosticResult(
+            event_type="disk",
+            host=host,
+            diagnostics=diagnostics
+        )
